@@ -1,9 +1,13 @@
 import type { ErrorRequestHandler } from 'express'
 import { AppError } from '../utils/AppError.js'
+import { DuplicateLeadError } from '../utils/DuplicateLeadError.js'
 
 export const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
   if (error instanceof AppError) {
-    response.status(error.statusCode).json({ error: error.message })
+    response.status(error.statusCode).json({
+      error: error.message,
+      ...(error instanceof DuplicateLeadError ? { duplicateLead: error.existingLead } : {}),
+    })
     return
   }
 

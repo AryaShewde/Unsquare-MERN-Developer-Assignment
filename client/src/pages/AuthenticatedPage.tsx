@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
+import { PipelineBoard } from '../components/PipelineBoard'
 
 export function AuthenticatedPage() {
   const { user, logout } = useAuth()
@@ -37,6 +38,7 @@ export function AuthenticatedPage() {
             </dl>
           </div>
         </section>
+        {user.role !== 'CLIENT' && <PipelineBoard />}
       </div>
     </main>
   )

@@ -74,7 +74,7 @@ JWTs expire after one hour. The frontend stores the token in `localStorage` for 
 - Advisor: belongs to exactly one brokerage; no user-administration access.
 - Client: belongs to exactly one brokerage; reusable access rules limit client records to the signed-in client.
 
-Non-platform users’ brokerage membership is derived from the authenticated database user. Brokerage Admin user lists and user lookups are scoped on the server; caller-supplied brokerage IDs cannot move a normal user into another tenant. `assertBrokerageAccess` and `assertClientRecordAccess` provide reusable server-side checks for future resource routes. No leads, client cases, or document resources are created in this phase.
+Non-platform users’ brokerage membership is derived from the authenticated database user. Brokerage Admin user lists and user lookups are scoped on the server; caller-supplied brokerage IDs cannot move a normal user into another tenant. `assertBrokerageAccess` and `assertClientRecordAccess` provide reusable server-side checks for resource routes.
 
 ## Checks
 
@@ -85,3 +85,56 @@ npm run build
 ```
 
 Backend integration tests use a disposable local MongoDB instance; the first test run may download its MongoDB binary. Tests do not write records to the configured Atlas database.
+
+## Phase 3: Leads and pipeline
+
+The lead pipeline has six controlled stages: `NEW`, `CONTACTED`, `QUALIFIED`, `APPLICATION`, `WON`, and `LOST`. Brokerage Admins and Advisors can create and update leads, move stages, and assign/unassign advisors. Only Brokerage Admins and Platform Admins can delete leads. Clients cannot access lead endpoints. Platform Admins may list across brokerages; a `brokerageId` list filter is available to them. Normal users are always scoped to their authenticated brokerage.
+
+### Lead API
+
+- `GET /api/leads` lists leads visible to the caller; optional `status` filter is supported.
+- `POST /api/leads` creates a lead. Platform Admins must provide a brokerage; other users’ brokerage is derived from authentication and a mismatching body ID is rejected.
+- `GET /api/leads/:leadId` and `PATCH /api/leads/:leadId` read/update one scoped lead.
+- `PATCH /api/leads/:leadId/status` changes pipeline stage and requires `status` plus the lead’s `expectedUpdatedAt` value.
+- `PATCH /api/leads/:leadId/assignment` accepts `{ "assignedAdvisorId": "<user-id>" }` or `null` to unassign. The advisor must be in the lead’s brokerage.
+- `DELETE /api/leads/:leadId` is restricted to Brokerage Admin and Platform Admin.
+- `GET /api/leads/advisors` and `GET /api/leads/brokerages` provide scoped board selectors.
+
+All lead API requests use `Authorization: Bearer <JWT>`. Brokerage scope is part of each database query/mutation; cross-brokerage lead IDs return 404. Lead responses omit internal normalized duplicate keys and authentication fields.
+
+### Webhook setup
+
+Brokerage Admins can create/rotate their own inbound token with `POST /api/brokerages/:brokerageId/lead-webhook-token`; Platform Admins can do this for either brokerage. The high-entropy token is returned once, and only its SHA-256 hash is stored. Rotating the token invalidates the previous token. Store the returned value in the external provider’s secret storage.
+
+Send `POST /api/webhooks/leads` with `Authorization: Bearer <brokerage-webhook-token>`, `Content-Type: application/json`, and a body like:
+
+```json
+{
+	"eventId": "source-record-123",
+	"firstName": "Jordan",
+	"lastName": "Taylor",
+	"email": "jordan@example.com",
+	"phone": "+1 555 123 4567",
+	"source": "Website form"
+}
+```
+
+Example with `curl.exe` (replace the URL and read the token from your secret manager; do not commit it):
+
+```sh
+curl.exe -X POST "https://YOUR-API/api/webhooks/leads" -H "Authorization: Bearer YOUR_BROKERAGE_WEBHOOK_TOKEN" -H "Content-Type: application/json" -d "{\"eventId\":\"source-record-123\",\"firstName\":\"Jordan\",\"lastName\":\"Taylor\",\"email\":\"jordan@example.com\",\"phone\":\"+1 555 123 4567\",\"source\":\"Website form\"}"
+```
+
+For Postman, create a POST request to `/api/webhooks/leads`, set Authorization type to Bearer Token, paste the brokerage token there, and use the JSON above as a raw JSON body. A real Zapier path is: trigger on a new lead in the source app, add **Webhooks by Zapier → POST**, set the URL and bearer header, map the lead fields, and map the source record ID to `eventId`. Make’s HTTP module can use the same URL/header/body. The API must be reachable via HTTPS by the provider; localhost alone is not reachable externally. This repository provides the compatible webhook endpoint but has not been connected to a provider account or tested against a live external provider.
+
+### Duplicate behavior
+
+Email is trimmed/lowercased and phone is compared by digits only. Checks and unique compound indexes include `brokerageId`, so the same person may exist independently in different brokerages. A duplicate person returns HTTP 409 with a safe `duplicateLead` summary from that brokerage; it is not silently inserted. When `eventId` is present, retrying the same event for that brokerage returns HTTP 200 with `duplicateEvent: true` and the original lead.
+
+### Realtime and concurrent changes
+
+Authenticated pipeline clients connect to Socket.IO with their JWT in the handshake auth data. The server reloads the user from MongoDB and assigns the socket to a server-generated brokerage room; Platform Admins join a separate platform room. `pipeline:update` carries an action (`created`, `updated`, `assigned`, `status`, or `deleted`) and safe lead data/ID. The browser refetches from the REST API after events. Room names are never accepted from clients, and no global lead broadcast is made.
+
+Status updates use optimistic concurrency: the client submits `expectedUpdatedAt`; only a matching current document is changed. If two users submit from the same old version, one succeeds and the stale update gets HTTP 409 and must refresh. This is a single-document compare-and-set, not a distributed lock; it relies on MongoDB’s atomic update behavior.
+
+The webhook is provider-agnostic, not a completed vendor-specific integration. No CRM features outside Phase 3 (client conversion, cases, documents, tasks, email, analytics, or queues) are included.

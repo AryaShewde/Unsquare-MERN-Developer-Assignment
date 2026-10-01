@@ -3,6 +3,8 @@ import { useAuth } from '../auth/useAuth'
 import { PipelineBoard } from '../components/PipelineBoard'
 import { AdvisorClients } from '../components/AdvisorClients'
 import { ClientPortal } from '../components/ClientPortal'
+import { AutomationAdmin } from '../components/AutomationAdmin'
+import { TaskBoard } from '../components/TaskBoard'
 
 export function AuthenticatedPage() {
   const { user, logout } = useAuth()
@@ -40,14 +42,33 @@ export function AuthenticatedPage() {
             </dl>
           </div>
         </section>
-        {user.role === 'CLIENT' ? (
-          <ClientPortal />
-        ) : (
-          <>
-            <PipelineBoard />
-            <AdvisorClients />
-          </>
-        )}
+
+        {/* Role-based sections */}
+        <section className="py-16">
+          <div className="mx-auto max-w-5xl">
+            {user.role === 'CLIENT' ? (
+              <ClientPortal />
+            ) : user.role === 'BROKERAGE_ADMIN' ? (
+              <>
+                <PipelineBoard />
+                <AdvisorClients />
+                <AutomationAdmin />
+              </>
+            ) : user.role === 'ADVISOR' ? (
+              <>
+                <PipelineBoard />
+                <TaskBoard />
+                <AdvisorClients />
+              </>
+            ) : user.role === 'PLATFORM_ADMIN' ? (
+              <>
+                <PipelineBoard />
+                <AdvisorClients />
+                <AutomationAdmin />
+              </>
+            ) : null}
+          </div>
+        </section>
       </div>
     </main>
   )

@@ -12,12 +12,16 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1143.0",
+    "@aws-sdk/s3-request-presigner": "^3.1143.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "file-type": "^22.1.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.19.1",
+    "multer": "^2.4.0",
     "socket.io": "^4.8.4",
     "zod": "^4.6.5"
   },
@@ -25,6 +29,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
     "@types/node": "^24.7.2",
     "@types/supertest": "^7.2.1",
     "mongodb-memory-server": "^11.3.0",

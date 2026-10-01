@@ -3,6 +3,7 @@ import { io } from 'socket.io-client'
 import { useAuth } from '../auth/useAuth'
 import {
   createLeadRequest,
+  convertLead,
   fetchLeadAdvisors,
   fetchLeadBrokerages,
   fetchLeads,
@@ -29,6 +30,7 @@ export function PipelineBoard() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [conversionCredentials, setConversionCredentials] = useState<Record<string, { email: string; password: string }>>({})
   const [realtime, setRealtime] = useState<'connecting' | 'connected' | 'disconnected'>('connecting')
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', source: 'Website', brokerageId: '' })
 
@@ -114,6 +116,21 @@ export function PipelineBoard() {
     }
   }
 
+  async function handleConvert(lead: Lead) {
+    if (!token) return
+    setError(null)
+    try {
+      const result = await convertLead(token, lead.id)
+      setLeads((current) => current.map((item) => item.id === result.lead.id ? result.lead : item))
+      setConversionCredentials((current) => ({
+        ...current,
+        [lead.id]: { email: result.client.email, password: result.temporaryPassword },
+      }))
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Could not convert the lead.')
+    }
+  }
+
   return (
     <section className="border-t border-[#d5d8ce] pt-10">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
@@ -161,6 +178,21 @@ export function PipelineBoard() {
                           <p className="mt-2 break-all text-xs text-[#687269]">{lead.email}</p>
                           <p className="mt-1 text-xs text-[#687269]">{lead.phone}</p>
                           <p className="mt-2 font-mono text-[11px] uppercase text-[#9b583b]">{lead.source}</p>
+                          {lead.convertedCaseId && (
+                            <p className="mt-2 text-xs font-semibold text-[#376447]">Converted to client</p>
+                          )}
+                          {!lead.convertedCaseId && (user?.role === 'BROKERAGE_ADMIN' || user?.role === 'ADVISOR') && (
+                            <button type="button" onClick={() => void handleConvert(lead)} className="mt-3 w-full border border-[#52695a] px-2 py-1.5 text-xs font-semibold text-[#26372d] hover:bg-[#f3f2ec]">
+                              Convert to client
+                            </button>
+                          )}
+                          {conversionCredentials[lead.id] && (
+                            <div className="mt-3 border-l-2 border-[#d6a34b] pl-2 text-[11px] leading-5 text-[#76613b]">
+                              <p>Client account created. Share this temporary password securely; it is shown once.</p>
+                              <p className="break-all font-mono">{conversionCredentials[lead.id].email}</p>
+                              <p className="break-all font-mono">{conversionCredentials[lead.id].password}</p>
+                            </div>
+                          )}
                           {user?.role === 'PLATFORM_ADMIN' && <p className="mt-1 text-xs text-[#687269]">{brokerages.find((item) => item._id === lead.brokerageId)?.name ?? 'Brokerage'}</p>}
                           <label className="mt-3 block text-[11px] text-[#687269]">
                             Advisor

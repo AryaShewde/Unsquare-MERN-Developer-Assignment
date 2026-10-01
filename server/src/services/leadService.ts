@@ -46,6 +46,10 @@ function publish(action: LeadRealtimeEvent['action'], brokerageId: string, leadI
   realtimePublisher?.({ action, brokerageId, leadId, lead })
 }
 
+export function publishLeadDomainUpdate(lead: LeadSummary): void {
+  publish('updated', lead.brokerageId, lead.id, lead)
+}
+
 export function serializeLead(lead: LeadDocument): LeadSummary {
   const raw = lead.toObject() as unknown as Record<string, unknown>
   const advisor = raw.assignedAdvisorId && typeof raw.assignedAdvisorId === 'object'
@@ -63,6 +67,8 @@ export function serializeLead(lead: LeadDocument): LeadSummary {
     status: raw.status as LeadStatus,
     assignedAdvisorId: advisorId ? String(advisorId) : null,
     assignedAdvisorName: advisor && typeof advisor.name === 'string' ? advisor.name : null,
+    convertedCaseId: raw.convertedCaseId ? String(raw.convertedCaseId) : null,
+    convertedAt: raw.convertedAt ? new Date(raw.convertedAt as string | Date).toISOString() : null,
     ...(typeof raw.notes === 'string' ? { notes: raw.notes } : {}),
     createdAt: new Date(raw.createdAt as string | Date).toISOString(),
     updatedAt: new Date(raw.updatedAt as string | Date).toISOString(),

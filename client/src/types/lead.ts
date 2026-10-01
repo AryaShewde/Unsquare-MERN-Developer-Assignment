@@ -13,6 +13,8 @@ export interface Lead {
   status: LeadStatus
   assignedAdvisorId: string | null
   assignedAdvisorName: string | null
+  convertedCaseId: string | null
+  convertedAt: string | null
   notes?: string
   createdAt: string
   updatedAt: string
@@ -28,4 +30,11 @@ export interface LeadAdvisor {
 export interface LeadBrokerage {
   _id: string
   name: string
+}
+
+export interface LeadConversionResult {
+  client: { id: string; name: string; email: string; role: 'CLIENT'; brokerageId: string | null; brokerageName: string | null }
+  clientCase: { id: string; brokerageId: string; leadId: string; clientUserId: string; applicationStatus: string }
+  temporaryPassword: string
+  lead: Lead
 }

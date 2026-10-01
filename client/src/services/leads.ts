@@ -1,4 +1,4 @@
-import type { Lead, LeadAdvisor, LeadBrokerage, LeadStatus } from '../types/lead'
+import type { Lead, LeadAdvisor, LeadBrokerage, LeadConversionResult, LeadStatus } from '../types/lead'
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
 
@@ -75,4 +75,8 @@ export async function updateLeadAssignment(
     body: JSON.stringify({ assignedAdvisorId }),
   })
   return result.lead
+}
+
+export async function convertLead(token: string, leadId: string): Promise<LeadConversionResult> {
+  return request<LeadConversionResult>(token, `/api/leads/${leadId}/convert`, { method: 'POST' })
 }

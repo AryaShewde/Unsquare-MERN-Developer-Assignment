@@ -21,6 +21,12 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response, _ne
     return
   }
 
+  if (error?.name === 'MulterError') {
+    const statusCode = error.code === 'LIMIT_FILE_SIZE' ? 413 : 400
+    response.status(statusCode).json({ error: statusCode === 413 ? 'Documents must be 10 MB or smaller.' : 'Invalid multipart upload.' })
+    return
+  }
+
   if (error instanceof SyntaxError && 'body' in error) {
     response.status(400).json({ error: 'Request body must be valid JSON.' })
     return

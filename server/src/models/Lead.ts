@@ -15,6 +15,8 @@ const leadSchema = new mongoose.Schema(
     assignedAdvisorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     notes: { type: String, trim: true, maxlength: 5000 },
     sourceEventId: { type: String, trim: true, select: false },
+    convertedCaseId: { type: mongoose.Schema.Types.ObjectId, ref: 'ClientCase', default: null },
+    convertedAt: { type: Date, default: null },
   },
   { timestamps: true },
 )

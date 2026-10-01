@@ -312,10 +312,13 @@ describe('Socket.IO pipeline isolation', () => {
     }
   })
 
-  it('rejects Client socket connections to the pipeline', async () => {
-    const client = io(socketUrl, { auth: { token: clientAToken }, transports: ['websocket'], reconnection: false })
-    const error = await new Promise<Error>((resolve) => client.once('connect_error', resolve))
-    expect(error.message).toContain('Not authorized')
+  it('allows Client sockets without granting brokerage-wide pipeline events', async () => {
+    const client = await connectedSocket(clientAToken)
+    const events: unknown[] = []
+    client.on('pipeline:update', (event) => events.push(event))
+    await createLead(adminAToken, leadPayload({ email: 'client-socket-no-pipeline@example.test' }))
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    expect(events).toHaveLength(0)
     client.disconnect()
   })
 })

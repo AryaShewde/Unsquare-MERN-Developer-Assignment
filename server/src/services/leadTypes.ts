@@ -11,6 +11,8 @@ export interface LeadSummary {
   status: LeadStatus
   assignedAdvisorId: string | null
   assignedAdvisorName: string | null
+  convertedCaseId: string | null
+  convertedAt: string | null
   notes?: string
   createdAt: string
   updatedAt: string

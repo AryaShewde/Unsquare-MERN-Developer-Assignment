@@ -6,6 +6,9 @@ import { userRouter } from './routes/userRoutes.js'
 import { leadRouter } from './routes/leadRoutes.js'
 import { brokerageWebhookRouter } from './routes/brokerageWebhookRoutes.js'
 import { webhookRouter } from './routes/webhookRoutes.js'
+import { clientRouter } from './routes/clientRoutes.js'
+import { caseRouter } from './routes/caseRoutes.js'
+import { documentRouter } from './routes/documentRoutes.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 export const app = express()
@@ -18,5 +21,8 @@ app.use('/api/users', userRouter)
 app.use('/api/leads', leadRouter)
 app.use('/api/brokerages', brokerageWebhookRouter)
 app.use('/api/webhooks', webhookRouter)
+app.use('/api/clients', clientRouter)
+app.use('/api/cases', caseRouter)
+app.use('/api/documents', documentRouter)
 
 app.use(errorHandler)

@@ -249,6 +249,16 @@ export async function changeLeadStatus(
     if (!user.brokerageId) throw new AppError(403, 'A brokerage is required to manage leads.')
     filter.brokerageId = user.brokerageId
   }
+
+  // Get the current lead to check old status before updating
+  const currentLead = await Lead.findOne(filter).select('status brokerageId assignedAdvisorId convertedCaseId firstName lastName email')
+  if (!currentLead) {
+    const stillExists = await getLeadDocument(user, leadId).catch(() => null)
+    if (!stillExists) throw new AppError(404, 'Lead not found.')
+    throw new AppError(409, 'This lead changed since you loaded it. Refresh and retry.')
+  }
+  const oldStatus = currentLead.status
+
   const updated = await Lead.findOneAndUpdate(filter, { $set: { status } }, { new: true, runValidators: true })
     .populate('assignedAdvisorId', 'name email')
   if (!updated) {
@@ -258,6 +268,26 @@ export async function changeLeadStatus(
   }
   const summary = serializeLead(updated)
   publish('status', summary.brokerageId, summary.id, summary)
+
+  // Trigger automation only on actual status change
+  if (oldStatus !== status) {
+    try {
+      const { processStageEmailAutomation } = await import('./emailAutomationService.js')
+      const { processStageTaskAutomation } = await import('./taskAutomationService.js')
+
+      // Run automation asynchronously - don't let failures affect the status update response
+      Promise.all([
+        processStageEmailAutomation({ lead: updated, oldStatus, newStatus: status }),
+        processStageTaskAutomation({ lead: updated, oldStatus, newStatus: status }),
+      ]).catch((err) => {
+        console.error('Automation error:', err)
+      })
+    } catch (err) {
+      // Log but don't fail the status change
+      console.error('Failed to trigger automation:', err)
+    }
+  }
+
   return summary
 }
 

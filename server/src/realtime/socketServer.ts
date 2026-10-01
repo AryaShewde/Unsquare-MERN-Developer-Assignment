@@ -6,6 +6,7 @@ import type { AuthenticatedUser } from '../middleware/requestUser.js'
 import { verifyToken } from '../services/tokenService.js'
 import { setLeadRealtimePublisher, type LeadRealtimeEvent } from '../services/leadService.js'
 import { setDocumentRealtimePublisher, type DocumentStatusEvent } from '../services/documentRealtime.js'
+import { setTaskRealtimePublisher, type TaskRealtimeEvent } from '../services/taskRealtime.js'
 
 const PLATFORM_ROOM = 'leadflow:platform-admins'
 
@@ -77,9 +78,15 @@ export function attachSocketServer(httpServer: HttpServer): Server {
     io.to(PLATFORM_ROOM).emit('document:update', event)
   })
 
+  setTaskRealtimePublisher((event: TaskRealtimeEvent) => {
+    io.to(brokerageRoom(event.brokerageId)).emit('task:update', event)
+    io.to(PLATFORM_ROOM).emit('task:update', event)
+  })
+
   io.on('close', () => {
     setLeadRealtimePublisher(null)
     setDocumentRealtimePublisher(null)
+    setTaskRealtimePublisher(null)
   })
   return io
 }

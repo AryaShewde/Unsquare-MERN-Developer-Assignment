@@ -9,6 +9,10 @@ import { webhookRouter } from './routes/webhookRoutes.js'
 import { clientRouter } from './routes/clientRoutes.js'
 import { caseRouter } from './routes/caseRoutes.js'
 import { documentRouter } from './routes/documentRoutes.js'
+import { emailTemplateRouter } from './routes/emailTemplateRoutes.js'
+import { emailTriggerRouter } from './routes/emailTriggerRoutes.js'
+import { taskTriggerRouter } from './routes/taskTriggerRoutes.js'
+import { taskRouter } from './routes/taskRoutes.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 export const app = express()
@@ -24,5 +28,9 @@ app.use('/api/webhooks', webhookRouter)
 app.use('/api/clients', clientRouter)
 app.use('/api/cases', caseRouter)
 app.use('/api/documents', documentRouter)
+app.use('/api/email-templates', emailTemplateRouter)
+app.use('/api/email-triggers', emailTriggerRouter)
+app.use('/api/task-triggers', taskTriggerRouter)
+app.use('/api/tasks', taskRouter)
 
 app.use(errorHandler)

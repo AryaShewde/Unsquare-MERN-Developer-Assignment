@@ -9,6 +9,7 @@ import {
   listLeadBrokeragesController,
   listLeadsController,
   updateLeadController,
+  getLeadSummaryController,
 } from '../controllers/leadController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requireRole } from '../middleware/requireRole.js'
@@ -18,10 +19,9 @@ import { convertLeadController } from '../controllers/conversionController.js'
 export const leadRouter = Router()
 const leadManagers = [ROLES.PLATFORM_ADMIN, ROLES.BROKERAGE_ADMIN, ROLES.ADVISOR] as const
 
-leadRouter.use(requireAuth, requireRole(...leadManagers))
-leadRouter.get('/advisors', listLeadAdvisorsController)
-leadRouter.get('/brokerages', listLeadBrokeragesController)
-leadRouter.get('/', listLeadsController)
+leadRouter.use(requireAuth)
+leadRouter.get('/summary', requireRole(...leadManagers), getLeadSummaryController)
+leadRouter.get('/', requireRole(...leadManagers), listLeadsController)
 leadRouter.post('/', createLeadController)
 leadRouter.get('/:leadId', getLeadController)
 leadRouter.patch('/:leadId', updateLeadController)

@@ -4,6 +4,8 @@ import { AppError } from '../utils/AppError.js'
 
 export async function requireWebhookSecret(request: Request, _response: Response, next: NextFunction): Promise<void> {
   const token = request.header('authorization')?.match(/^Bearer\s+(.+)$/i)?.[1]
+    ?? (typeof request.query.token === 'string' ? request.query.token : null)
+
   if (!token) {
     next(new AppError(401, 'Webhook credential required.'))
     return

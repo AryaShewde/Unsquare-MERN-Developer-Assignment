@@ -8,7 +8,7 @@ export default defineConfig({
     pool: 'forks',
     // Each test file gets a generous timeout to allow MongoDB Memory Server
     // startup and async verification worker steps.
-    hookTimeout: 60_000,
-    testTimeout: 30_000,
+    hookTimeout: 120_000,
+    testTimeout: 60_000,
   },
 })

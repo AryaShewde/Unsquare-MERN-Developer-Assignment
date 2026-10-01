@@ -137,6 +137,32 @@ async function handleUniqueConflict(brokerageId: string, email: string, phone: s
   throw new AppError(409, 'A conflicting lead request was received. Please retry.')
 }
 
+export async function getLeadSummary(brokerageId: string | null) {
+  const filter: FilterQuery<LeadDocument> = brokerageId ? { brokerageId: new Types.ObjectId(brokerageId) } : {};
+
+  const pipeline = [
+    { $match: filter },
+    { $group: { _id: "$status", count: { $sum: 1 } } }
+  ];
+
+  const results = await Lead.aggregate(pipeline);
+
+  const counts = LEAD_STATUSES.reduce((acc, status) => {
+    acc[status] = 0;
+    return acc;
+  }, {} as Record<string, number>);
+
+  let total = 0;
+  for (const item of results) {
+    if (item._id) {
+      counts[item._id] = item.count;
+      total += item.count;
+    }
+  }
+
+  return { total, ...counts };
+}
+
 async function createLeadRecord(brokerageId: string, input: LeadInput, sourceEventId?: string) {
   const normalizedEmail = normalizeEmail(input.email)
   const normalizedPhone = normalizePhone(input.phone)
@@ -173,6 +199,7 @@ async function createLeadRecord(brokerageId: string, input: LeadInput, sourceEve
 }
 
 export async function createLead(user: AuthenticatedUser, input: LeadInput) {
+  if (user.role === ROLES.CLIENT) throw new AppError(403, 'Clients cannot create leads.')
   const brokerageId = await resolveLeadBrokerage(user, input.brokerageId)
   return createLeadRecord(brokerageId, input)
 }

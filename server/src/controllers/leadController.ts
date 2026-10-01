@@ -11,9 +11,11 @@ import {
   listLeadBrokerages,
   listLeads,
   updateLead,
+  getLeadSummary,
 } from '../services/leadService.js'
 import type { LeadStatus } from '../models/leadStatus.js'
 import { AppError } from '../utils/AppError.js'
+import type { AuthenticatedUser } from '../middleware/requestUser.js'
 
 const createSchema = z.object({
   firstName: z.string().trim().min(1).max(100),
@@ -56,6 +58,18 @@ export async function createLeadController(request: Request, response: Response)
   if (!input) return
   const result = await createLead(request.user!, input)
   response.status(201).json({ lead: result.lead })
+}
+
+export async function getLeadSummaryController(request: Request, response: Response): Promise<void> {
+  const user = request.user as AuthenticatedUser
+  if (!user.brokerageId && user.role !== 'PLATFORM_ADMIN') {
+    throw new AppError(403, 'A brokerage is required.')
+  }
+  const brokerageId = user.role === 'PLATFORM_ADMIN'
+    ? (typeof request.query.brokerageId === 'string' ? request.query.brokerageId : null)
+    : user.brokerageId
+
+  response.json(await getLeadSummary(brokerageId))
 }
 
 export async function listLeadsController(request: Request, response: Response): Promise<void> {

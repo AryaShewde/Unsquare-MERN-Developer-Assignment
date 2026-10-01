@@ -11,6 +11,7 @@ import {
   updateLeadStatus,
 } from '../services/leads'
 import { LEAD_STATUSES, type Lead, type LeadAdvisor, type LeadBrokerage, type LeadStatus } from '../types/lead'
+import { PipelineSummary } from './PipelineSummary'
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
 const statusLabels: Record<LeadStatus, string> = {
@@ -59,13 +60,14 @@ export function PipelineBoard() {
       })
 
     const socket = io(apiUrl, { auth: { token } })
-    socket.on('connect', () => setRealtime('connected'))
+    socket.on('connect', () => {
+        setRealtime('connected')
+        void refreshLeads()
+    })
     socket.on('disconnect', () => setRealtime('disconnected'))
     socket.on('connect_error', () => setRealtime('disconnected'))
     socket.on('pipeline:update', () => {
-      void fetchLeads(token)
-        .then(setLeads)
-        .catch(() => setError('Realtime refresh failed. Reload the pipeline to retry.'))
+      void refreshLeads()
     })
 
     return () => {
@@ -133,6 +135,7 @@ export function PipelineBoard() {
 
   return (
     <section className="border-t border-[#d5d8ce] pt-10">
+      <PipelineSummary leads={leads} />
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="mb-2 font-mono text-xs uppercase text-[#9b583b]">Lead management</p>

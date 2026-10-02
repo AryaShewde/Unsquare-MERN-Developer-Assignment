@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import { useAuth } from '../auth/useAuth'
 import {
@@ -47,7 +47,7 @@ export function PipelineBoard() {
     return counts
   }
 
-  async function refreshLeads() {
+  const refreshLeads = useCallback(async () => {
     if (!token || loading) return
     try {
       const result = await fetchLeads(token)
@@ -67,7 +67,7 @@ export function PipelineBoard() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not refresh leads.')
     }
-  }
+  }, [token, loading])
 
   useEffect(() => {
     if (loading || !token) return
@@ -103,7 +103,7 @@ export function PipelineBoard() {
       active = false
       socket.disconnect()
     }
-  }, [token, loading])
+  }, [token, loading, refreshLeads])
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

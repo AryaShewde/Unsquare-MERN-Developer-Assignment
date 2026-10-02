@@ -28,7 +28,8 @@ async function request<T>(token: string, path: string, init?: RequestInit): Prom
 }
 
 export async function fetchLeads(token: string): Promise<Lead[]> {
-  return request<Lead[]>(token, '/api/leads')
+  const result = await request<{ leads: Lead[] }>(token, '/api/leads')
+  return result.leads
 }
 
 export async function fetchLeadSummary(token: string) {

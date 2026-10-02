@@ -26,6 +26,10 @@ const allowedOrigins = [
 ]
 
 app.use(cors({ origin: allowedOrigins }))
+
+// Custom route registration before global JSON parsing
+app.use('/api/tally', tallyRouter)
+
 app.use(express.json())
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
@@ -33,7 +37,6 @@ app.use('/api/users', userRouter)
 app.use('/api/leads', leadRouter)
 app.use('/api/brokerages', brokerageWebhookRouter)
 app.use('/api/webhooks', webhookRouter)
-app.use('/api/tally', tallyRouter)
 app.use('/api/cron', cronRouter)
 app.use('/api/clients', clientRouter)
 app.use('/api/cases', caseRouter)

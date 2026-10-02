@@ -7,6 +7,7 @@ export async function requireWebhookSecret(request: Request, _response: Response
     ?? (typeof request.query.token === 'string' ? request.query.token : null)
 
   if (!token) {
+    console.error('Webhook credential required.')
     next(new AppError(401, 'Webhook credential required.'))
     return
   }
@@ -14,6 +15,7 @@ export async function requireWebhookSecret(request: Request, _response: Response
     request.webhookBrokerageId = await findWebhookBrokerageId(token)
     next()
   } catch (error) {
+    console.error('Webhook auth failed:', error)
     next(error)
   }
 }

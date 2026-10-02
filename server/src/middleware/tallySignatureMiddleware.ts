@@ -10,7 +10,9 @@ export function verifyTallySignature(request: Request, response: Response, next:
   }
 
   const signature = request.header('tally-signature')
+  console.log('Received signature:', signature)
   if (!signature) {
+    console.error('Tally signature missing.')
     next(new AppError(401, 'Tally signature missing.'))
     return
   }

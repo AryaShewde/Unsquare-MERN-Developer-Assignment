@@ -4,26 +4,32 @@ import { app } from '../src/app.js'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import crypto from 'node:crypto'
-import * as webhookService from '../src/services/webhookSecretService.js'
+import { Brokerage } from '../src/models/Brokerage.js'
 import { vi } from 'vitest'
 
 vi.mock('../src/services/webhookSecretService.js', () => ({
-    findWebhookBrokerageId: vi.fn().mockResolvedValue('test-brokerage-id')
+    findWebhookBrokerageId: vi.fn().mockImplementation((token) => {
+        if (token === 'valid-test-token') return '6abaf25984890b179a7c98a2'
+        return null
+    })
 }))
 
 describe('Tally Webhook Integration', () => {
     let mongo: MongoMemoryServer
+    let brokerageId: string
     const signingSecret = 'test-signing-secret'
 
     beforeAll(async () => {
         process.env.TALLY_WEBHOOK_SIGNING_SECRET = signingSecret
         mongo = await MongoMemoryServer.create()
         await mongoose.connect(mongo.getUri(), { dbName: 'tally_test' })
+        const brokerage = await Brokerage.create({ name: 'Tally Test' })
+        brokerageId = brokerage.id
     })
 
     const generateSignature = (payload: any) => {
         const hmac = crypto.createHmac('sha256', signingSecret)
-        hmac.update(JSON.stringify(payload))
+        hmac.update(typeof payload === 'string' ? payload : JSON.stringify(payload))
         return hmac.digest('base64')
     }
 
@@ -64,7 +70,7 @@ describe('Tally Webhook Integration', () => {
         const response = await request(app)
             .post('/api/tally/leads')
             .set('tally-signature', signature)
-            .set('Authorization', 'Bearer test-brokerage-token')
+            .set('Authorization', 'Bearer valid-test-token')
             .set('Content-Type', 'application/json')
             .send(payloadString)
             

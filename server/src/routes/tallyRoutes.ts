@@ -7,4 +7,11 @@ import { verifyTallySignature } from '../middleware/tallySignatureMiddleware.js'
 export const tallyRouter = Router()
 
 // Use raw body parser to capture buffer for HMAC verification
-tallyRouter.post('/leads', express.raw({ type: 'application/json' }), requireWebhookSecret, verifyTallySignature, createTallyLeadController)
+tallyRouter.post(
+  '/leads', 
+  express.raw({ type: 'application/json' }), 
+  requireWebhookSecret, 
+  verifyTallySignature, 
+  express.json(), 
+  createTallyLeadController
+)

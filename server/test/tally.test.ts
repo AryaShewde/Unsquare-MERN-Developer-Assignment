@@ -45,7 +45,7 @@ describe('Tally Webhook Integration', () => {
         expect(response.status).toBe(401)
     })
 
-    it('should process a valid external lead with robust field mapping', async () => {
+    it('should process a valid external lead with real Tally structure', async () => {
         // Realistic mapping configuration
         process.env.TALLY_FIRST_NAME_REF = 'question_OBZW1Y'
         process.env.TALLY_LAST_NAME_REF = 'question_V1akEM'
@@ -54,12 +54,12 @@ describe('Tally Webhook Integration', () => {
 
         const payload = {
             data: {
-                submission_id: 'tf-real-12345',
+                submission_id: 'q57ZDJg',
                 fields: [
-                    { field: { key: 'question_OBZW1Y' }, type: 'text', value: 'Test' },
-                    { field: { key: 'question_V1akEM' }, type: 'text', value: 'Lead' },
-                    { field: { key: 'question_PBNajB' }, type: 'email', value: 'testlead@gmail.com' },
-                    { field: { key: 'question_EbG4zB' }, type: 'phone_number', value: '+917715838869' }
+                    { key: 'question_OBZW1Y', label: 'First Name', type: 'INPUT_TEXT', value: 'Arya' },
+                    { key: 'question_V1akEM', label: 'Last Name', type: 'INPUT_TEXT', value: 'Shewde' },
+                    { key: 'question_PBNajB', label: 'Email', type: 'INPUT_EMAIL', value: 'aryashewde4@gmail.com' },
+                    { key: 'question_EbG4zB', label: 'Phone', type: 'INPUT_PHONE_NUMBER', value: '+917715838869' }
                 ]
             }
         }
@@ -76,9 +76,10 @@ describe('Tally Webhook Integration', () => {
             
         // Validate result
         expect(response.status).toBe(201)
-        expect(response.body.lead.firstName).toBe('Test')
-        expect(response.body.lead.lastName).toBe('Lead')
-        expect(response.body.lead.email).toBe('testlead@gmail.com')
+        expect(response.body.lead.firstName).toBe('Arya')
+        expect(response.body.lead.lastName).toBe('Shewde')
+        expect(response.body.lead.email).toBe('aryashewde4@gmail.com')
         expect(response.body.lead.phone).toBe('+917715838869')
     })
+
 })

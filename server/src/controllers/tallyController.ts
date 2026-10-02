@@ -11,7 +11,10 @@ export async function createTallyLeadController(request: Request, response: Resp
   // Map values using field key (highest priority), ref, or id
   const answerMap = new Map<string, any>()
   for (const answer of data.fields) {
-    const key = answer.field.key ?? answer.field.ref ?? answer.field.id
+    // Tally payload can have fields as {key, ...} directly, 
+    // or nested within {field: {key, ...}}
+    const field = answer.field || answer
+    const key = field.key ?? field.ref ?? field.id
     if (key) answerMap.set(key, answer.value)
   }
 

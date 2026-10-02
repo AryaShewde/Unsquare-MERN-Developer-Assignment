@@ -161,14 +161,11 @@ export function PipelineBoard() {
   }
 
   return (
-    <section className="border-t border-[#d5d8ce] pt-10">
+    <section className="pt-6">
       <PipelineSummary counts={summary} />
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="mb-2 font-mono text-xs uppercase text-[#9b583b]">Lead management</p>
-          <h2 className="text-2xl font-semibold tracking-tight">Pipeline</h2>
-        </div>
-        <span className="font-mono text-xs uppercase text-[#718073]">Realtime {realtime}</span>
+      <div className="mb-8 flex items-center justify-between">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">Pipeline</h2>
+        <span className="text-xs font-mono bg-accent px-2 py-1 rounded text-accent-foreground">Realtime: {realtime}</span>
       </div>
 
       <form onSubmit={handleCreate} className="mb-8 grid gap-4 border border-border bg-card p-6 rounded-lg sm:grid-cols-2 lg:grid-cols-6 items-end">
@@ -197,7 +194,7 @@ export function PipelineBoard() {
             {LEAD_STATUSES.map((status) => {
               const stageLeads = leads.filter((lead) => lead.status === status)
               return (
-                <section key={status} aria-label={`${statusLabels[status]} leads`} className="min-h-48 border-t-2 border-[#26372d] bg-[#e9e9e1]/70 p-3">
+                <section key={status} aria-label={`${statusLabels[status]} leads`} className="min-h-48 border border-border bg-card p-3 rounded-lg shadow-sm">
                   <header className="mb-3 flex items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold uppercase text-foreground">{statusLabels[status]}</h3>
                     <span className="font-mono text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{stageLeads.length}</span>

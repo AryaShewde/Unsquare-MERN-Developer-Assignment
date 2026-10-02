@@ -79,26 +79,26 @@ export function AdvisorClients() {
   }
 
   return (
-    <section className="border-t border-[#d5d8ce] pt-10">
-      <p className="mb-2 font-mono text-xs uppercase text-[#9b583b]">Brokerage workspace</p>
-      <h2 className="text-2xl font-semibold tracking-tight">Clients and documents</h2>
-      {user?.role === 'PLATFORM_ADMIN' && <p className="mt-2 text-xs text-[#687269]">Platform-wide client list</p>}
-      {error && <p role="alert" className="mt-4 border-l-2 border-[#c64e3d] bg-white/60 px-4 py-3 text-sm text-[#9f392d]">{error}</p>}
-      {loading ? <p className="py-6 text-sm text-[#687269]">Loading clients…</p> : clients.length === 0 ? (
-        <p className="mt-5 bg-white/70 p-5 text-sm text-[#687269]">No client accounts in this scope yet.</p>
+    <section className="border-t border-border pt-10">
+      <p className="mb-2 font-mono text-xs uppercase text-primary">Brokerage workspace</p>
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">Clients and documents</h2>
+      {user?.role === 'PLATFORM_ADMIN' && <p className="mt-2 text-xs text-muted-foreground">Platform-wide client list</p>}
+      {error && <p role="alert" className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>}
+      {loading ? <p className="py-6 text-sm text-muted-foreground">Loading clients…</p> : clients.length === 0 ? (
+        <p className="mt-5 bg-card p-5 text-sm text-muted-foreground">No client accounts in this scope yet.</p>
       ) : (
         <div className="mt-5 space-y-5">
           {clients.map((client) => (
-            <article key={client.id} className="border-t-2 border-[#26372d] bg-white/70 p-5">
+            <article key={client.id} className="border-t-2 border-border bg-card p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="text-base font-semibold">{client.name}</h3>
-                <span className="text-sm text-[#687269]">{client.email}</span>
+                <h3 className="text-base font-semibold text-foreground">{client.name}</h3>
+                <span className="text-sm text-muted-foreground">{client.email}</span>
               </div>
               {client.cases.map((clientCase) => (
-                <section key={clientCase.id} className="mt-4 border-t border-[#e1e3dc] pt-4">
-                  <div className="flex flex-wrap justify-between gap-2 text-sm">
+                <section key={clientCase.id} className="mt-4 border-t border-border pt-4">
+                  <div className="flex flex-wrap justify-between gap-2 text-sm text-foreground">
                     <span>Case · {clientCase.applicationStatus.replaceAll('_', ' ')}</span>
-                    <span className="text-[#687269]">Advisor: {clientCase.advisorName ?? 'Not assigned'}</span>
+                    <span className="text-muted-foreground">Advisor: {clientCase.advisorName ?? 'Not assigned'}</span>
                   </div>
                   <DocumentList documents={client.documentsByCase[clientCase.id] ?? []} onDownload={(document) => void handleDownload(document)} onRetry={(document) => void handleRetry(document)} busyDocumentId={busyDocumentId} />
                 </section>

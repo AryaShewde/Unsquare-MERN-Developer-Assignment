@@ -1,21 +1,34 @@
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';
-import { useTheme } from '../../auth/ThemeContext';
 import { Button } from '../ui/Button';
 
-export function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
+export function TopHeader() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  
+  const navItems = [
+    { name: 'Dashboard', path: '/' },
+    { name: 'Clients', path: '/clients' },
+    { name: 'Documents', path: '/documents' },
+    { name: 'Tasks', path: '/tasks' },
+    { name: 'Automation', path: '/automation' },
+  ];
+
+  if (!user) return null;
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-4 md:px-8">
-      <Button variant="ghost" className="md:hidden" onClick={onMenuClick}>
-        Menu
-      </Button>
+    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8 shadow-sm">
+      <div className="flex items-center gap-6">
+          <span className="text-lg font-bold text-primary">LeadFlow</span>
+          <nav className="hidden md:flex gap-2">
+            {navItems.map(item => (
+                <NavLink key={item.name} to={item.path} className={({isActive}) => `px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${isActive ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground'}`}>
+                    {item.name}
+                </NavLink>
+            ))}
+          </nav>
+      </div>
       <div className="flex items-center gap-4 ml-auto">
-        <span className="text-sm text-muted-foreground">{user?.name} ({user?.role})</span>
-        <Button variant="outline" onClick={toggleTheme}>
-          {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-        </Button>
+        <span className="text-sm font-medium text-foreground">{user?.name}</span>
         <Button variant="destructive" onClick={logout}>
           Sign out
         </Button>

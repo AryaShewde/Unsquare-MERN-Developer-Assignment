@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/useAuth'
+import { Button } from './ui/Button'
 import { fetchEmailTemplates, createEmailTemplate, updateEmailTemplate, deleteEmailTemplate, type EmailTemplate } from '../services/emailTemplates'
 import { fetchEmailTriggers, createEmailTrigger, updateEmailTrigger, deleteEmailTrigger, type EmailTrigger } from '../services/emailTriggers'
 import { fetchTaskTriggers, createTaskTrigger, updateTaskTrigger, deleteTaskTrigger, type TaskTrigger } from '../services/taskTriggers'
@@ -186,28 +187,28 @@ export function AutomationAdmin() {
       {/* Email Templates Tab */}
       {activeTab === 'email-templates' && (
         <div>
-          <div className="mb-6 p-4 bg-gray-50 rounded">
-            <h3 className="font-semibold mb-3">
+          <div className="mb-6 p-6 bg-card border border-border rounded-xl shadow-sm">
+            <h3 className="font-semibold mb-4 text-foreground">
               {editingTemplateId ? 'Edit Template' : 'Create New Template'}
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <input
                 type="text"
                 placeholder="Template Name"
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 value={templateForm.name}
                 onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
               />
               <input
                 type="text"
                 placeholder="Subject"
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 value={templateForm.subject}
                 onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
               />
               <textarea
                 placeholder="Email Body (use {{clientName}}, {{advisorName}}, {{leadName}} as placeholders)"
-                className="w-full p-2 border rounded h-32"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground h-32"
                 value={templateForm.body}
                 onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })}
               />
@@ -215,12 +216,13 @@ export function AutomationAdmin() {
                 <input
                   type="checkbox"
                   id="templateActive"
+                  className="rounded border-input text-primary focus:ring-primary"
                   checked={templateForm.active}
                   onChange={(e) => setTemplateForm({ ...templateForm, active: e.target.checked })}
                 />
-                <label htmlFor="templateActive">Active</label>
+                <label htmlFor="templateActive" className="text-sm font-medium text-foreground">Active</label>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 Available placeholders: {PLACEHOLDERS.join(', ')}
               </div>
               <div className="flex gap-2">
@@ -254,37 +256,29 @@ export function AutomationAdmin() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {emailTemplates.map((template) => (
-              <div key={template.id} className="p-4 border rounded bg-white">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-semibold">
-                      {template.name}
-                      {!template.active && <span className="ml-2 text-xs text-gray-400">(Inactive)</span>}
-                    </h4>
-                    <p className="text-sm text-gray-600">Subject: {template.subject}</p>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{template.body}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                      onClick={() => startEditTemplate(template)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                      onClick={() => handleDeleteTemplate(template.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
+              <div key={template.id} className="p-6 bg-card border border-border rounded-xl shadow-sm flex justify-between items-start">
+                <div>
+                  <h4 className="font-bold text-foreground">
+                    {template.name}
+                    {!template.active && <span className="ml-2 text-xs text-muted-foreground">(Inactive)</span>}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mt-1">Subject: {template.subject}</p>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{template.body}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => startEditTemplate(template)}>
+                    Edit
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDeleteTemplate(template.id)}>
+                    Delete
+                  </Button>
                 </div>
               </div>
             ))}
             {emailTemplates.length === 0 && (
-              <p className="text-gray-500">No email templates configured.</p>
+              <p className="text-muted-foreground italic">No email templates configured.</p>
             )}
           </div>
         </div>
@@ -293,13 +287,13 @@ export function AutomationAdmin() {
       {/* Email Triggers Tab */}
       {activeTab === 'email-triggers' && (
         <div>
-          <div className="mb-6 p-4 bg-gray-50 rounded">
-            <h3 className="font-semibold mb-3">
+          <div className="mb-6 p-6 bg-card border border-border rounded-xl shadow-sm">
+            <h3 className="font-semibold mb-4 text-foreground">
               {editingEmailTriggerId ? 'Edit Email Trigger' : 'Create New Email Trigger'}
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <select
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 value={emailTriggerForm.stage}
                 onChange={(e) => setEmailTriggerForm({ ...emailTriggerForm, stage: e.target.value })}
               >
@@ -310,7 +304,7 @@ export function AutomationAdmin() {
                 ))}
               </select>
               <select
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 value={emailTriggerForm.templateId}
                 onChange={(e) => setEmailTriggerForm({ ...emailTriggerForm, templateId: e.target.value })}
               >
@@ -325,85 +319,60 @@ export function AutomationAdmin() {
                 <input
                   type="checkbox"
                   id="emailTriggerActive"
+                  className="rounded border-input text-primary focus:ring-primary"
                   checked={emailTriggerForm.active}
                   onChange={(e) => setEmailTriggerForm({ ...emailTriggerForm, active: e.target.checked })}
                 />
-                <label htmlFor="emailTriggerActive">Active</label>
+                <label htmlFor="emailTriggerActive" className="text-sm font-medium text-foreground">Active</label>
               </div>
               <div className="flex gap-2">
-                {editingEmailTriggerId ? (
-                  <>
-                    <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                      onClick={() => handleUpdateEmailTrigger(editingEmailTriggerId)}
-                    >
-                      Update
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                      onClick={() => {
-                        setEditingEmailTriggerId(null)
-                        setEmailTriggerForm({ stage: 'NEW', templateId: '', active: true })
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                    onClick={handleCreateEmailTrigger}
-                    disabled={!emailTriggerForm.templateId}
-                  >
-                    Create Trigger
-                  </button>
+                <Button onClick={editingEmailTriggerId ? () => handleUpdateEmailTrigger(editingEmailTriggerId) : handleCreateEmailTrigger}>
+                    {editingEmailTriggerId ? 'Update' : 'Create Trigger'}
+                </Button>
+                {editingEmailTriggerId && (
+                  <Button variant="outline" onClick={() => { setEditingEmailTriggerId(null); setEmailTriggerForm({ stage: 'NEW', templateId: '', active: true }); }}>
+                    Cancel
+                  </Button>
                 )}
               </div>
             </div>
           </div>
-
-          <div className="space-y-3">
+          <div className="space-y-4">
             {emailTriggers.map((trigger) => (
-              <div key={trigger.id} className="p-4 border rounded bg-white">
+              <div key={trigger.id} className="p-6 bg-card border border-border rounded-xl shadow-sm">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold">
+                    <h4 className="font-semibold text-foreground">
                       Stage: {trigger.stage}
-                      {!trigger.active && <span className="ml-2 text-xs text-gray-400">(Inactive)</span>}
+                      {!trigger.active && <span className="ml-2 text-xs text-muted-foreground">(Inactive)</span>}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground mt-1">
                       Template: {trigger.templateName || 'N/A'}
                     </p>
                     {trigger.templateSubject && (
-                      <p className="text-sm text-gray-500">Subject: {trigger.templateSubject}</p>
+                      <p className="text-sm text-muted-foreground mt-1">Subject: {trigger.templateSubject}</p>
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                      onClick={() => {
+                    <Button variant="outline" size="sm" onClick={() => {
                         setEditingEmailTriggerId(trigger.id)
                         setEmailTriggerForm({
                           stage: trigger.stage,
                           templateId: trigger.templateId,
                           active: trigger.active,
                         })
-                      }}
-                    >
+                      }}>
                       Edit
-                    </button>
-                    <button
-                      className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                      onClick={() => handleDeleteEmailTrigger(trigger.id)}
-                    >
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteEmailTrigger(trigger.id)}>
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
             ))}
             {emailTriggers.length === 0 && (
-              <p className="text-gray-500">No email triggers configured.</p>
+              <p className="text-muted-foreground italic">No email triggers configured.</p>
             )}
           </div>
         </div>
@@ -412,13 +381,13 @@ export function AutomationAdmin() {
       {/* Task Triggers Tab */}
       {activeTab === 'task-triggers' && (
         <div>
-          <div className="mb-6 p-4 bg-gray-50 rounded">
-            <h3 className="font-semibold mb-3">
+          <div className="mb-6 p-6 bg-card border border-border rounded-xl shadow-sm">
+            <h3 className="font-semibold mb-4 text-foreground">
               {editingTaskTriggerId ? 'Edit Task Trigger' : 'Create New Task Trigger'}
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <select
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 value={taskTriggerForm.stage}
                 onChange={(e) => setTaskTriggerForm({ ...taskTriggerForm, stage: e.target.value })}
               >
@@ -431,20 +400,20 @@ export function AutomationAdmin() {
               <input
                 type="text"
                 placeholder="Task Title"
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 value={taskTriggerForm.title}
                 onChange={(e) => setTaskTriggerForm({ ...taskTriggerForm, title: e.target.value })}
               />
               <textarea
                 placeholder="Task Description (optional)"
-                className="w-full p-2 border rounded h-20"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground h-20"
                 value={taskTriggerForm.description}
                 onChange={(e) => setTaskTriggerForm({ ...taskTriggerForm, description: e.target.value })}
               />
               <input
                 type="number"
                 placeholder="Due in (days)"
-                className="w-full p-2 border rounded"
+                className="w-full p-2.5 border border-input bg-background rounded-lg text-foreground"
                 min={1}
                 max={365}
                 value={taskTriggerForm.dueDays}
@@ -454,38 +423,20 @@ export function AutomationAdmin() {
                 <input
                   type="checkbox"
                   id="taskTriggerActive"
+                  className="rounded border-input text-primary focus:ring-primary"
                   checked={taskTriggerForm.active}
                   onChange={(e) => setTaskTriggerForm({ ...taskTriggerForm, active: e.target.checked })}
                 />
-                <label htmlFor="taskTriggerActive">Active</label>
+                <label htmlFor="taskTriggerActive" className="text-sm font-medium text-foreground">Active</label>
               </div>
               <div className="flex gap-2">
-                {editingTaskTriggerId ? (
-                  <>
-                    <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                      onClick={() => handleUpdateTaskTrigger(editingTaskTriggerId)}
-                    >
-                      Update
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                      onClick={() => {
-                        setEditingTaskTriggerId(null)
-                        setTaskTriggerForm({ stage: 'NEW', title: '', description: '', dueDays: 2, active: true })
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                    onClick={handleCreateTaskTrigger}
-                    disabled={!taskTriggerForm.title}
-                  >
-                    Create Trigger
-                  </button>
+                <Button onClick={editingTaskTriggerId ? () => handleUpdateTaskTrigger(editingTaskTriggerId) : handleCreateTaskTrigger}>
+                    {editingTaskTriggerId ? 'Update' : 'Create Trigger'}
+                </Button>
+                {editingTaskTriggerId && (
+                  <Button variant="outline" onClick={() => { setEditingTaskTriggerId(null); setTaskTriggerForm({ stage: 'NEW', title: '', description: '', dueDays: 1, active: true }); }}>
+                    Cancel
+                  </Button>
                 )}
               </div>
             </div>
@@ -493,22 +444,20 @@ export function AutomationAdmin() {
 
           <div className="space-y-3">
             {taskTriggers.map((trigger) => (
-              <div key={trigger.id} className="p-4 border rounded bg-white">
+              <div key={trigger.id} className="p-6 bg-card border border-border rounded-xl shadow-sm">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold">
+                    <h4 className="font-semibold text-foreground">
                       {trigger.stage} → {trigger.title}
-                      {!trigger.active && <span className="ml-2 text-xs text-gray-400">(Inactive)</span>}
+                      {!trigger.active && <span className="ml-2 text-xs text-muted-foreground">(Inactive)</span>}
                     </h4>
                     {trigger.description && (
-                      <p className="text-sm text-gray-600 mt-1">{trigger.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{trigger.description}</p>
                     )}
-                    <p className="text-sm text-gray-500 mt-1">Due: {trigger.dueDays} day(s)</p>
+                    <p className="text-sm text-muted-foreground mt-1">Due: {trigger.dueDays} day(s)</p>
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                      onClick={() => {
+                    <Button variant="outline" size="sm" onClick={() => {
                         setEditingTaskTriggerId(trigger.id)
                         setTaskTriggerForm({
                           stage: trigger.stage,
@@ -517,22 +466,18 @@ export function AutomationAdmin() {
                           dueDays: trigger.dueDays,
                           active: trigger.active,
                         })
-                      }}
-                    >
+                      }}>
                       Edit
-                    </button>
-                    <button
-                      className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                      onClick={() => handleDeleteTaskTrigger(trigger.id)}
-                    >
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteTaskTrigger(trigger.id)}>
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
             ))}
             {taskTriggers.length === 0 && (
-              <p className="text-gray-500">No task triggers configured.</p>
+              <p className="text-muted-foreground italic">No task triggers configured.</p>
             )}
           </div>
         </div>

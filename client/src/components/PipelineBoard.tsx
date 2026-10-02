@@ -135,7 +135,7 @@ export function PipelineBoard() {
 
   return (
     <section className="border-t border-[#d5d8ce] pt-10">
-      <PipelineSummary leads={leads} />
+      <PipelineSummary counts={summary} />
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="mb-2 font-mono text-xs uppercase text-[#9b583b]">Lead management</p>

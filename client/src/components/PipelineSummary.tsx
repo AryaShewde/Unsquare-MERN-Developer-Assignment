@@ -1,10 +1,10 @@
-import { LEAD_STATUSES, type Lead, type LeadStatus } from '../types/lead';
+import { LEAD_STATUSES } from '../types/lead';
 
 export interface PipelineSummaryProps {
-  leads: Lead[];
+  counts: Record<string, number>;
 }
 
-const statusLabels: Record<LeadStatus, string> = {
+const statusLabels: Record<string, string> = {
   NEW: 'New',
   CONTACTED: 'Contacted',
   QUALIFIED: 'Qualified',
@@ -13,13 +13,8 @@ const statusLabels: Record<LeadStatus, string> = {
   LOST: 'Lost',
 };
 
-export function PipelineSummary({ leads }: PipelineSummaryProps) {
-  const counts = LEAD_STATUSES.reduce((acc, status) => {
-    acc[status] = leads.filter((lead) => lead.status === status).length;
-    return acc;
-  }, {} as Record<LeadStatus, number>);
-
-  const totalLeads = leads.length;
+export function PipelineSummary({ counts }: PipelineSummaryProps) {
+  const totalLeads = counts.total || 0;
 
   return (
     <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">

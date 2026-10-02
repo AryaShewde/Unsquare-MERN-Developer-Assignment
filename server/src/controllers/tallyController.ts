@@ -4,17 +4,18 @@ import { AppError } from '../utils/AppError.js'
 
 export async function createTallyLeadController(request: Request, response: Response): Promise<void> {
   const { data } = request.body
-  if (!data || !data.fields || !data.submission_id) {
+  // Support both submission_id (old) and submissionId (new)
+  const submissionId = data?.submission_id ?? data?.submissionId
+  if (!data || !data.fields || !submissionId) {
     throw new AppError(400, 'Invalid Tally payload.')
   }
 
   // Map values using field key (highest priority), ref, or id
   const answerMap = new Map<string, any>()
   for (const answer of data.fields) {
-    // Tally payload can have fields as {key, ...} directly, 
-    // or nested within {field: {key, ...}}
-    const field = answer.field || answer
-    const key = field.key ?? field.ref ?? field.id
+    // Tally payload can have answers as {key, value} directly
+    // or nested within {field: {key, ...}, value }
+    const key = answer.key ?? answer.field?.key ?? answer.field?.ref ?? answer.field?.id
     if (key) answerMap.set(key, answer.value)
   }
 
@@ -38,7 +39,7 @@ export async function createTallyLeadController(request: Request, response: Resp
     throw new AppError(400, 'Missing required lead fields in Tally submission.')
   }
 
-  const eventId = data.submission_id
+  const eventId = submissionId
   const result = await createWebhookLead(request.webhookBrokerageId!, leadInput, eventId)
   
   response.status(result.duplicateEvent ? 200 : 201).json({ lead: result.lead })

@@ -16,15 +16,9 @@ import { taskRouter } from './routes/taskRoutes.js'
 import { tallyRouter } from './routes/tallyRoutes.js'
 import { cronRouter } from './routes/cronRoutes.js'
 import { errorHandler } from './middleware/errorHandler.js'
+import { allowedOrigins } from './config/cors.js'
 
 export const app = express()
-
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:4173',
-  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : [])
-]
 
 app.use(cors({ origin: allowedOrigins }))
 

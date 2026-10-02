@@ -6,6 +6,7 @@ import type { AuthenticatedUser } from '../middleware/requestUser.js'
 import { verifyToken } from '../services/tokenService.js'
 import { setLeadRealtimePublisher, type LeadRealtimeEvent } from '../services/leadService.js'
 import { setDocumentRealtimePublisher, type DocumentStatusEvent } from '../services/documentRealtime.js'
+import { allowedOrigins } from '../config/cors.js'
 import { setTaskRealtimePublisher, type TaskRealtimeEvent } from '../services/taskRealtime.js'
 
 const PLATFORM_ROOM = 'leadflow:platform-admins'
@@ -20,7 +21,7 @@ function clientRoom(clientId: string): string {
 
 export function attachSocketServer(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
-    cors: { origin: process.env.CLIENT_URL ?? 'http://localhost:5173' },
+    cors: { origin: allowedOrigins },
   })
 
   io.use(async (socket, next) => {

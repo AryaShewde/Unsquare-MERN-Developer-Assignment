@@ -4,6 +4,12 @@ import { app } from '../src/app.js'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import crypto from 'node:crypto'
+import * as webhookService from '../src/services/webhookSecretService.js'
+import { vi } from 'vitest'
+
+vi.mock('../src/services/webhookSecretService.js', () => ({
+    findWebhookBrokerageId: vi.fn().mockResolvedValue('test-brokerage-id')
+}))
 
 describe('Tally Webhook Integration', () => {
     let mongo: MongoMemoryServer
@@ -23,13 +29,50 @@ describe('Tally Webhook Integration', () => {
 
     it('should reject invalid signature', async () => {
         const payload = { data: { submission_id: '123' } }
+        const payloadString = JSON.stringify(payload)
         const response = await request(app)
             .post('/api/tally/leads')
             .set('tally-signature', 'invalid')
             .set('Authorization', 'Bearer test-brokerage-token') // Mock auth
-            .send(payload)
+            .set('Content-Type', 'application/json')
+            .send(payloadString)
         expect(response.status).toBe(401)
     })
 
-    // Additional tests for mapping, required fields, etc.
+    it('should process a valid external lead with robust field mapping', async () => {
+        // Realistic mapping configuration
+        process.env.TALLY_FIRST_NAME_REF = 'question_OBZW1Y'
+        process.env.TALLY_LAST_NAME_REF = 'question_V1akEM'
+        process.env.TALLY_EMAIL_REF = 'question_PBNajB'
+        process.env.TALLY_PHONE_REF = 'question_EbG4zB'
+
+        const payload = {
+            data: {
+                submission_id: 'tf-real-12345',
+                fields: [
+                    { field: { key: 'question_OBZW1Y' }, type: 'text', value: 'Test' },
+                    { field: { key: 'question_V1akEM' }, type: 'text', value: 'Lead' },
+                    { field: { key: 'question_PBNajB' }, type: 'email', value: 'testlead@gmail.com' },
+                    { field: { key: 'question_EbG4zB' }, type: 'phone_number', value: '+917715838869' }
+                ]
+            }
+        }
+        
+        const payloadString = JSON.stringify(payload)
+        const signature = generateSignature(payloadString)
+
+        const response = await request(app)
+            .post('/api/tally/leads')
+            .set('tally-signature', signature)
+            .set('Authorization', 'Bearer test-brokerage-token')
+            .set('Content-Type', 'application/json')
+            .send(payloadString)
+            
+        // Validate result
+        expect(response.status).toBe(201)
+        expect(response.body.lead.firstName).toBe('Test')
+        expect(response.body.lead.lastName).toBe('Lead')
+        expect(response.body.lead.email).toBe('testlead@gmail.com')
+        expect(response.body.lead.phone).toBe('+917715838869')
+    })
 })

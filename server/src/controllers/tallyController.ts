@@ -8,10 +8,10 @@ export async function createTallyLeadController(request: Request, response: Resp
     throw new AppError(400, 'Invalid Tally payload.')
   }
 
-  // Map values using field ref (stable) or id (fallback)
+  // Map values using field key (highest priority), ref, or id
   const answerMap = new Map<string, any>()
   for (const answer of data.fields) {
-    const key = answer.field.ref ?? answer.field.id
+    const key = answer.field.key ?? answer.field.ref ?? answer.field.id
     if (key) answerMap.set(key, answer.value)
   }
 

@@ -2,7 +2,11 @@ import mongoose from 'mongoose'
 
 export type DatabaseStatus = 'connected' | 'disconnected' | 'not_configured'
 
+let cachedConnection: typeof mongoose | null = null
+
 export async function connectToDatabase(): Promise<void> {
+  if (cachedConnection) return
+
   const uri = process.env.MONGODB_URI?.trim()
 
   if (!uri) {
@@ -11,7 +15,7 @@ export async function connectToDatabase(): Promise<void> {
   }
 
   try {
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 })
+    cachedConnection = await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 })
     console.info('Connected to MongoDB.')
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

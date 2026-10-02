@@ -6,8 +6,13 @@ export default defineConfig({
     // module-level singletons (e.g. mongoose connection, process.env) are
     // fully isolated between test suites.
     pool: 'forks',
-    // Each test file gets a generous timeout to allow MongoDB Memory Server
-    // startup and async verification worker steps.
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+    // Increased timeouts to accommodate slower resource allocation 
+    // on the current machine for MongoDB instances.
     hookTimeout: 120_000,
     testTimeout: 60_000,
   },

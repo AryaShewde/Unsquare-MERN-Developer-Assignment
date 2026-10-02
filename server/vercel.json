@@ -10,6 +10,10 @@
       "use": "@vercel/node"
     }
   ],
+  "rewrites": [
+    { "source": "/api/cron/verify", "destination": "/api/cron/verify.ts" },
+    { "source": "/api/(.*)", "destination": "/api/index.ts" }
+  ],
   "crons": [
     {
       "path": "/api/cron/verify",

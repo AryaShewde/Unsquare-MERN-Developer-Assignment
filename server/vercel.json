@@ -1,4 +1,15 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/cron/verify.ts",
+      "use": "@vercel/node"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/verify",

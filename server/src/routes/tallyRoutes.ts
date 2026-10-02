@@ -12,6 +12,5 @@ tallyRouter.post(
   express.raw({ type: 'application/json' }), 
   requireWebhookSecret, 
   verifyTallySignature, 
-  express.json(), 
   createTallyLeadController
 )

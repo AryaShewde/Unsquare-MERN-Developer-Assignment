@@ -7,6 +7,7 @@ import {
   fetchLeadAdvisors,
   fetchLeadBrokerages,
   fetchLeads,
+  fetchLeadSummary,
   updateLeadAssignment,
   updateLeadStatus,
 } from '../services/leads'
@@ -26,6 +27,7 @@ const statusLabels: Record<LeadStatus, string> = {
 export function PipelineBoard() {
   const { token, user } = useAuth()
   const [leads, setLeads] = useState<Lead[]>([])
+  const [summary, setSummary] = useState<Record<string, number>>({})
   const [advisors, setAdvisors] = useState<LeadAdvisor[]>([])
   const [brokerages, setBrokerages] = useState<LeadBrokerage[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,8 +39,32 @@ export function PipelineBoard() {
 
   async function refreshLeads() {
     if (!token) return
-    const result = await fetchLeads(token)
-    setLeads(result)
+    try {
+      const result = await fetchLeads(token)
+      setLeads(result)
+      const fallbackSummary = calculateSummaryFromLeads(result)
+      
+      try {
+        const summaryResult = await fetchLeadSummary(token)
+        if (summaryResult && Object.keys(summaryResult).length > 0) {
+          setSummary(summaryResult)
+        } else {
+          setSummary(fallbackSummary)
+        }
+      } catch {
+        setSummary(fallbackSummary)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not refresh leads.')
+    }
+  }
+
+  function calculateSummaryFromLeads(leads: Lead[]): Record<string, number> {
+    const counts: Record<string, number> = { total: leads.length }
+    LEAD_STATUSES.forEach(status => {
+      counts[status] = leads.filter(l => l.status === status).length
+    })
+    return counts
   }
 
   useEffect(() => {
@@ -48,9 +74,15 @@ export function PipelineBoard() {
       .then(([loadedLeads, loadedAdvisors, loadedBrokerages]) => {
         if (!active) return
         setLeads(loadedLeads)
+        setSummary(calculateSummaryFromLeads(loadedLeads)) // Fallback immediately
         setAdvisors(loadedAdvisors)
         setBrokerages(loadedBrokerages)
         setForm((current) => ({ ...current, brokerageId: current.brokerageId || loadedBrokerages[0]?._id || '' }))
+        
+        // Attempt backend summary separately
+        fetchLeadSummary(token)
+            .then(summary => { if (active && summary) setSummary(summary) })
+            .catch(() => {}) // Ignore backend summary errors
       })
       .catch((requestError: unknown) => {
         if (active) setError(requestError instanceof Error ? requestError.message : 'Could not load the pipeline.')

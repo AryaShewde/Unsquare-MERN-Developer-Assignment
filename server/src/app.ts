@@ -21,7 +21,9 @@ export const app = express()
 
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:5174',
   'http://localhost:4173',
+  'https://unsquareassignmentbackend.vercel.app',
   ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : [])
 ]
 

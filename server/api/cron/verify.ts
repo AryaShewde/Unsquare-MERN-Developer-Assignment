@@ -3,7 +3,7 @@ import { connectToDatabase } from '../../src/config/database.js'
 
 export default async (req: any, res: any) => {
   const authHeader = req.headers.authorization
-  const expectedAuth = \Bearer \\
+  const expectedAuth = `Bearer ${process.env.CRON_SECRET}`
 
   if (!process.env.CRON_SECRET || authHeader !== expectedAuth) {
     return res.status(401).json({ error: 'Unauthorized.' })

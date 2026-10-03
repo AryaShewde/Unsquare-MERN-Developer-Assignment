@@ -22,6 +22,8 @@ const leadManagers = [ROLES.PLATFORM_ADMIN, ROLES.BROKERAGE_ADMIN, ROLES.ADVISOR
 leadRouter.use(requireAuth)
 leadRouter.get('/summary', requireRole(...leadManagers), getLeadSummaryController)
 leadRouter.get('/', requireRole(...leadManagers), listLeadsController)
+leadRouter.get('/brokerages', requireRole(ROLES.PLATFORM_ADMIN, ROLES.BROKERAGE_ADMIN), listLeadBrokeragesController)
+leadRouter.get('/advisors', requireRole(ROLES.PLATFORM_ADMIN, ROLES.BROKERAGE_ADMIN), listLeadAdvisorsController)
 leadRouter.post('/', createLeadController)
 leadRouter.get('/:leadId', getLeadController)
 leadRouter.patch('/:leadId', updateLeadController)

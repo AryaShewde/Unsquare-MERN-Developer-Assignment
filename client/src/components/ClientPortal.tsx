@@ -33,15 +33,23 @@ export function ClientPortal() {
       })
       .finally(() => { if (active) setLoading(false) })
 
-    const socket = io(apiUrl, { auth: { token } })
-    socket.on('document:update', (event: { clientId?: string }) => {
-      if (event.clientId === user?.id) {
-        void fetchMyDocuments(token).then(setDocuments).catch(() => setError('Could not refresh document status.'))
-      }
-    })
+    const isProduction = import.meta.env.PROD;
+    let socket: any = null;
+
+    if (!isProduction) {
+      socket = io(apiUrl, { auth: { token } });
+      socket.on('document:update', (event: { clientId?: string }) => {
+        if (event.clientId === user?.id) {
+          void fetchMyDocuments(token).then(setDocuments).catch(() => setError('Could not refresh document status.'))
+        }
+      });
+    }
+
     return () => {
-      active = false
-      socket.disconnect()
+      active = false;
+      if (socket) {
+        socket.disconnect();
+      }
     }
   }, [token, user?.id])
 

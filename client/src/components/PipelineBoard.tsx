@@ -88,20 +88,31 @@ export function PipelineBoard() {
         if (active) setLoadingLeads(false)
       })
 
-    const socket = io(apiUrl, { auth: { token } })
-    socket.on('connect', () => {
-        setRealtime('connected')
+    const isProduction = import.meta.env.PROD;
+    
+    if (isProduction) {
+      setRealtime('connected');
+    }
+
+    const socket = isProduction ? null : io(apiUrl, { auth: { token } })
+
+    if (socket) {
+      socket.on('connect', () => {
+          setRealtime('connected')
+          void refreshLeads()
+      })
+      socket.on('disconnect', () => setRealtime('disconnected'))
+      socket.on('connect_error', () => setRealtime('disconnected'))
+      socket.on('pipeline:update', () => {
         void refreshLeads()
-    })
-    socket.on('disconnect', () => setRealtime('disconnected'))
-    socket.on('connect_error', () => setRealtime('disconnected'))
-    socket.on('pipeline:update', () => {
-      void refreshLeads()
-    })
+      })
+    }
 
     return () => {
       active = false
-      socket.disconnect()
+      if (socket) {
+        socket.disconnect()
+      }
     }
   }, [token, loading, refreshLeads])
 

@@ -4,7 +4,7 @@ LeadFlow is a mortgage-brokerage platform. Phase 1 provides the React/TypeScript
 
 ## Deployed URLs
 
-- Frontend: https://agent-6abff5--unsquare-mern-developer-assignment.netlify.app/
+- Frontend: https://unsquare-mern-developer-assignment.netlify.app/
 - Backend: https://unsquareassignmentbackend.vercel.app/
 
 ## Requirements and setup

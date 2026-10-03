@@ -36,13 +36,21 @@ export function AdvisorClients() {
       .catch((requestError: unknown) => { if (active) setError(requestError instanceof Error ? requestError.message : 'Could not load brokerage clients.') })
       .finally(() => { if (active) setLoading(false) })
 
-    const socket = io(apiUrl, { auth: { token } })
-    socket.on('document:update', () => {
-      void refresh().catch(() => setError('Could not refresh document status.'))
-    })
+    const isProduction = import.meta.env.PROD;
+    let socket: any = null;
+
+    if (!isProduction) {
+      socket = io(apiUrl, { auth: { token } });
+      socket.on('document:update', () => {
+        void refresh().catch(() => setError('Could not refresh document status.'))
+      });
+    }
+
     return () => {
-      active = false
-      socket.disconnect()
+      active = false;
+      if (socket) {
+        socket.disconnect();
+      }
     }
   }, [token])
 

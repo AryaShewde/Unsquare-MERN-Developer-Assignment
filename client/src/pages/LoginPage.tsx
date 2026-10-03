@@ -41,7 +41,7 @@ export function LoginPage() {
         <section className="grid w-full gap-12 md:grid-cols-[1fr_0.5fr] md:items-center">
           <div>
             <p className="mb-5 font-mono text-xs uppercase tracking-widest text-primary">Secure workspace</p>
-            <h1 className="text-5xl font-extrabold tracking-tight">Welcome back.</h1>
+            <h1 className="text-5xl font-extrabold tracking-tight drop-shadow-lg transition-all duration-300 hover:drop-shadow-2xl hover:scale-105 cursor-default">Welcome.</h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
               Sign in to verify your LeadFlow account and brokerage access.
             </p>

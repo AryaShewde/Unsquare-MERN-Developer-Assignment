@@ -9,7 +9,7 @@ This project is a full-stack MERN application using React, TypeScript, and Vite 
 - Frontend: [https://unsquare-mern-developer-assignment.netlify.app/](https://unsquare-mern-developer-assignment.netlify.app/)
 - Backend: [https://unsquareassignmentbackend.vercel.app/](https://unsquareassignmentbackend.vercel.app/)
 - Backend health check: [https://unsquareassignmentbackend.vercel.app/api/health](https://unsquareassignmentbackend.vercel.app/api/health)
-- Tally test form: [https://tally.so/r/rjzQpp](https://tally.so/r/rjzQpp)
+- Tally test form (Use Unique Values): [https://tally.so/r/rjzQpp](https://tally.so/r/rjzQpp)
 
 ## How to Test the Project
 1. Open the [deployed frontend](https://unsquare-mern-developer-assignment.netlify.app/).

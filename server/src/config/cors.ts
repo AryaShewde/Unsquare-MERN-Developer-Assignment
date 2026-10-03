@@ -5,6 +5,7 @@ export const allowedOrigins: (string | RegExp)[] = [
   'http://localhost:5174',
   'http://localhost:4173',
   'https://unsquare-mern-developer-assignment.netlify.app',
+  'https://agent-6abff5--unsquare-mern-developer-assignment.netlify.app',
   // Deploy previews and branch deploys, e.g. https://<id>--unsquare-mern-developer-assignment.netlify.app
   /^https:\/\/[a-z0-9-]+--unsquare-mern-developer-assignment\.netlify\.app$/,
   ...(process.env.CLIENT_URL

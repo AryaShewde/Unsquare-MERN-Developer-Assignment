@@ -89,14 +89,12 @@ export function PipelineBoard() {
       })
 
     const isProduction = import.meta.env.PROD;
+    let socket: any = null;
     
     if (isProduction) {
       setRealtime('connected');
-    }
-
-    const socket = isProduction ? null : io(apiUrl, { auth: { token } })
-
-    if (socket) {
+    } else {
+      socket = io(apiUrl, { auth: { token } });
       socket.on('connect', () => {
           setRealtime('connected')
           void refreshLeads()

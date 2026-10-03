@@ -6,10 +6,6 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 
   const navItems = [
     { name: 'Dashboard', path: '/', roles: ['PLATFORM_ADMIN', 'BROKERAGE_ADMIN', 'ADVISOR'] },
-    { name: 'Clients', path: '/clients', roles: ['PLATFORM_ADMIN', 'BROKERAGE_ADMIN', 'ADVISOR'] },
-    { name: 'Documents', path: '/documents', roles: ['PLATFORM_ADMIN', 'BROKERAGE_ADMIN', 'ADVISOR', 'CLIENT'] },
-    { name: 'Tasks', path: '/tasks', roles: ['PLATFORM_ADMIN', 'BROKERAGE_ADMIN', 'ADVISOR'] },
-    { name: 'Automation', path: '/automation', roles: ['PLATFORM_ADMIN', 'BROKERAGE_ADMIN'] },
   ];
 
   if (!user) return null;

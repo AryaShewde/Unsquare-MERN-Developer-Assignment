@@ -7,10 +7,6 @@ export function TopHeader() {
   
   const navItems = [
     { name: 'Dashboard', path: '/' },
-    { name: 'Clients', path: '/clients' },
-    { name: 'Documents', path: '/documents' },
-    { name: 'Tasks', path: '/tasks' },
-    { name: 'Automation', path: '/automation' },
   ];
 
   if (!user) return null;

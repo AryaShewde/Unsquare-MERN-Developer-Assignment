@@ -2,6 +2,11 @@
 
 LeadFlow is a mortgage-brokerage platform. Phase 1 provides the React/TypeScript/Vite frontend, Express/TypeScript API, Tailwind CSS v4, and Mongoose setup. Phase 2 adds JWT authentication, four user roles, brokerage membership, and scoped user management. Phase 3 adds brokerage-isolated leads and a live pipeline. Phase 4 converts leads into client cases and provides private document upload with asynchronous simulated verification.
 
+## Deployed URLs
+
+- Frontend: https://agent-6abff5--unsquare-mern-developer-assignment.netlify.app/
+- Backend: https://unsquareassignmentbackend.vercel.app/
+
 ## Requirements and setup
 
 - Node.js 20.19+ (or 22.12+) and npm
